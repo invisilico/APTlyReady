@@ -1,0 +1,52 @@
+# trials and tribulations of APT
+
+First install MATLAB on linux by running the bash script you download
+sudo apt install matlab-support
+provide the path to the installation 
+
+Installing toolboxes and packages needs sudo which is not automatically granted, and it is kinda messy because only the home user can open matlab which then opens the addon manager. 
+
+This solutions is the neates If you want to avoid messing with folder permissions:
+
+    Add an addon like normal until you get the permission error.
+    Open a terminal and run "ps -eo cmd | grep AddOnProductInstaller | head -n 1"
+    You should see AddOnProductInstaller from your installation dir with (very) long cmd line arguments.
+    Run this as sudo
+
+Once done, folow nvidia documentation to install docker:
+https://docs.nvidia.com/ai-enterprise/deployment-guide/dg-docker.html
+
+to install nvidia-container for docker
+
+curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg \
+      && curl -s -L https://nvidia.github.io/libnvidia-container/ubuntu20.04/libnvidia-container.list | \
+            sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
+            sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list      
+##we are using pop, derivative of ubuntu, so reading distro name as recommended does not directly work for us
+           
+DO NOT install nvidia-docker2: not needed and messes with everything
+
+At the end of set up for docker, you run this:
+sudo docker run --rm --gpus all nvidia/cuda:11.0-base nvidia-smi
+it should ideally give you nvidia-smi info from within the container
+
+BUT IT DOES NOT thanks to a cgroups issue that nvidia refuses to solve. It deals with process and memory management and hardware allocation. https://github.com/systemd/systemd/issues/13477
+
+to fix this, you need to edit the systemd settings, this can be done by making changes as root:
+
+sudo -i (and give password) to become root on terminal
+echo 'GRUB_CMDLINE_LINUX=systemd.unified_cgroup_hierarchy=false' > /etc/default/grub.d/cgroup.cfg
+update-grub
+reboot now
+
+Once rebooted, run "podman info" in terminal, it lists cgroups version, if successful it should show 1.
+install podman info by running "sudo apt install podman" if required
+
+Now testing docker backend with APT reveals the same issue it does with conda on windows: no free GPUs found.
+This is because we are using our GPU to drive the display and all graphical outputs and our CPU does not have integrated graphics.
+
+Solution found!
+
+The issue is caused by a stupid line of code APT enforces in file DLBackEndClass.m , A variable called minFreeMem is set to 9000 MiB, change it to something reasonable like 4000 for a 6GB card or 6000 for an 8GB card.
+
+Everything supposedly works after that.
