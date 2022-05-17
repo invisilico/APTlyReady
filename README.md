@@ -41,4 +41,4 @@ Select your folder in the gui, and let the files process.
 
 ---
 
-Made by Nish [invisilico](https://github.com/invisilico) @ the Agrawal lab to pre-process footage for post estimation with APT.
+Made by Nish [[invisilico](https://github.com/invisilico)] @ the Agrawal lab to pre-process footage for post estimation with APT.
