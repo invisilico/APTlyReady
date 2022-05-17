@@ -1,7 +1,6 @@
 # APTLY Ready
-___
 
-The APT Preprocessor is meant to be an efficient tool to preprocess tons of video footage of really high resolutions/frame rates using opencv and python3. The tool tracks a single fly walking in a channel and produces a video with the fly centered in frame. It was made to reduce processing overhead with APT and also because both flytracker and ctrax are not just incredibly resource intensive but also very inefficient/inaccurate. This method (in our hands) takes less than 15 seconds per video and produces virtually no errors.
+The APT Preprocessor is meant to be an efficient tool to preprocess tons of video footage of high resolutions and frame rates using opencv and python3. The tool tracks a single fly walking in a channel and produces a video with the fly centered in frame. It was made to reduce processing overhead with APT and also because both flytracker and ctrax are not just incredibly resource intensive but also very inefficient/inaccurate. This method (in our hands) takes less than 15 seconds per video and produces virtually no errors.
 
 A future version will be more extensible with flexibility in parameters. It will also classify motion into Rest, Left, Right and Retreat with temporal smoothing while also providing an option to discard frames/bouts of rest to save only important bouts of motion for analysis.
 
